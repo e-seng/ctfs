@@ -1,14 +1,7 @@
-# APKey WriteUp
-### solved by e-seng (petiole)
+# APKey
 
-## Problem
-### Description
+> This app contains some unique keys. Can you get one?
 
-```md
-This app contains some unique keys. Can you get one?
-```
-
-### Challenge files
 [APKey.zip](./APKey.zip), with zip password `hackthebox` and sha256sum
 `0e901ee8858a83d64bf65daead62785c89ac157440b8c1affbc62b32036cccf1` which expands
 to:
@@ -17,8 +10,6 @@ to:
 ./APKey
 └── APKey.apk
 ```
-
-## Solving Process
 
 decompiling the apk can simply be done via `jadx-gui (jadx)`
 
