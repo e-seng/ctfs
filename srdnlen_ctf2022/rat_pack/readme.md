@@ -134,26 +134,26 @@ this, admittedly, looks really confusing, but analyzing the associated assembly
 actually simplifies things.
 
 ```asm
-1608:	48 85 c0             	test   rax,rax
-160b:	74 39                	je     1646 <_Z8greetRatPP3rat+0xb5>
-160d:	8b 45 f4             	mov    eax,DWORD PTR [rbp-0xc]
-1610:	48 98                	cdqe
-1612:	48 8d 14 c5 00 00 00 	lea    rdx,[rax*8+0x0]
-1619:	00 
-161a:	48 8b 45 e8          	mov    rax,QWORD PTR [rbp-0x18]
-161e:	48 01 d0             	add    rax,rdx
-1621:	48 8b 00             	mov    rax,QWORD PTR [rax]
-1624:	48 8b 50 08          	mov    rdx,QWORD PTR [rax+0x8]
-1628:	8b 45 f4             	mov    eax,DWORD PTR [rbp-0xc]
-162b:	48 98                	cdqe
-162d:	48 8d 0c c5 00 00 00 	lea    rcx,[rax*8+0x0]
-1634:	00 
-1635:	48 8b 45 e8          	mov    rax,QWORD PTR [rbp-0x18]
-1639:	48 01 c8             	add    rax,rcx
-163c:	48 8b 00             	mov    rax,QWORD PTR [rax]
-163f:	48 89 c7             	mov    rdi,rax
-1642:	ff d2                	call   rdx
-1644:	eb 0c                	jmp    1652 <_Z8greetRatPP3rat+0xc1>
+1608:   48 85 c0                test   rax,rax
+160b:   74 39                   je     1646 <_Z8greetRatPP3rat+0xb5>
+160d:   8b 45 f4                mov    eax,DWORD PTR [rbp-0xc]
+1610:   48 98                   cdqe
+1612:   48 8d 14 c5 00 00 00    lea    rdx,[rax*8+0x0]
+1619:   00
+161a:   48 8b 45 e8             mov    rax,QWORD PTR [rbp-0x18]
+161e:   48 01 d0                add    rax,rdx
+1621:   48 8b 00                mov    rax,QWORD PTR [rax]
+1624:   48 8b 50 08             mov    rdx,QWORD PTR [rax+0x8]
+1628:   8b 45 f4                mov    eax,DWORD PTR [rbp-0xc]
+162b:   48 98                   cdqe
+162d:   48 8d 0c c5 00 00 00    lea    rcx,[rax*8+0x0]
+1634:   00
+1635:   48 8b 45 e8             mov    rax,QWORD PTR [rbp-0x18]
+1639:   48 01 c8                add    rax,rcx
+163c:   48 8b 00                mov    rax,QWORD PTR [rax]
+163f:   48 89 c7                mov    rdi,rax
+1642:   ff d2                   call   rdx
+1644:   eb 0c                   jmp    1652 <_Z8greetRatPP3rat+0xc1>
 ```
 
 *be not afraid*
@@ -162,31 +162,31 @@ the following are annotations of the disassembly, as it relates to the decompile
 code
 
 ```asm
-1608:	48 85 c0             	test   rax,rax                        # - if(rat_pointers[rat_number] == (rat *) 0x0) {...
-160b:	74 39                	je     1646 <_Z8greetRatPP3rat+0xb5>  # |
-160d:	8b 45 f4             	mov    eax,DWORD PTR [rbp-0xc]        # - (condition returned false, rat_pointers[rat_number] != (rat *) 0x0), so rat exists
-1610:	48 98                	cdqe                                  # - setup (**(code **)(rat_pointers[rat_number] + 8))(rat_pointers[rat_number]);
-1612:	48 8d 14 c5 00 00 00 	lea    rdx,[rax*8+0x0]                # - rdx is now set to the address offset of the n-th rat in the array
-1619:	00                                                           #
-161a:	48 8b 45 e8          	mov    rax,QWORD PTR [rbp-0x18]       #
-161e:	48 01 d0             	add    rax,rdx                        #
-1621:	48 8b 00             	mov    rax,QWORD PTR [rax]            #
-1624:	48 8b 50 08          	mov    rdx,QWORD PTR [rax+0x8]        # - get address of function pointer in rat class
-                                                                    #   (probably, this seems to point to a shared "print rat name function" address.)
-                                                                    #   this function is actually dialogue@offset 269
-1628:	8b 45 f4             	mov    eax,DWORD PTR [rbp-0xc]        # - 
-162b:	48 98                	cdqe                                  #
-162d:	48 8d 0c c5 00 00 00 	lea    rcx,[rax*8+0x0]                #
-1634:	00                                                           # - call (**(code **)(rat_pointers[rat_number] + 8))(rat_pointers[rat_number]);
-1635:	48 8b 45 e8          	mov    rax,QWORD PTR [rbp-0x18]       # |
-1639:	48 01 c8             	add    rax,rcx                        # |
-163c:	48 8b 00             	mov    rax,QWORD PTR [rax]            # |
-163f:	48 89 c7             	mov    rdi,rax                        # |> set $rdi, the first argument, to be $rax, the address of the rat being executed
-1642:	ff d2                	call   rdx                            # |> call the function at the address of $rdx, usually dialogue(*rat)
-1644:	eb 0c                	jmp    1652 <_Z8greetRatPP3rat+0xc1>  # - (condition returned true, rat_pointers[rat_number] != (rat *) 0x0), so rat does not exists
+1608:   48 85 c0                test   rax,rax                        # - if(rat_pointers[rat_number] == (rat *) 0x0) {...
+160b:   74 39                   je     1646 <_Z8greetRatPP3rat+0xb5>  # |
+160d:   8b 45 f4                mov    eax,DWORD PTR [rbp-0xc]        # - (condition returned false, rat_pointers[rat_number] != (rat *) 0x0), so rat exists
+1610:   48 98                   cdqe                                  # - setup (**(code **)(rat_pointers[rat_number] + 8))(rat_pointers[rat_number]);
+1612:   48 8d 14 c5 00 00 00    lea    rdx,[rax*8+0x0]                # - rdx is now set to the address offset of the n-th rat in the array
+1619:   00                                                            #
+161a:   48 8b 45 e8             mov    rax,QWORD PTR [rbp-0x18]       #
+161e:   48 01 d0                add    rax,rdx                        #
+1621:   48 8b 00                mov    rax,QWORD PTR [rax]            #
+1624:   48 8b 50 08             mov    rdx,QWORD PTR [rax+0x8]        # - get address of function pointer in rat class
+                                                                      #   (probably, this seems to point to a shared "print rat name function" address.)
+                                                                      #   this function is actually dialogue@offset 269
+1628:   8b 45 f4                mov    eax,DWORD PTR [rbp-0xc]        # -
+162b:   48 98                   cdqe                                  #
+162d:   48 8d 0c c5 00 00 00    lea    rcx,[rax*8+0x0]                #
+1634:   00                                                            # - call (**(code **)(rat_pointers[rat_number] + 8))(rat_pointers[rat_number]);
+1635:   48 8b 45 e8             mov    rax,QWORD PTR [rbp-0x18]       # |
+1639:   48 01 c8                add    rax,rcx                        # |
+163c:   48 8b 00                mov    rax,QWORD PTR [rax]            # |
+163f:   48 89 c7                mov    rdi,rax                        # |> set $rdi, the first argument, to be $rax, the address of the rat being executed
+1642:   ff d2                   call   rdx                            # |> call the function at the address of $rdx, usually dialogue(*rat)
+1644:   eb 0c                   jmp    1652 <_Z8greetRatPP3rat+0xc1>  # - (condition returned true, rat_pointers[rat_number] != (rat *) 0x0), so rat does not exists
 ```
 
-upon further investigation, the crash wsa due to `1624:	48 8b 50 08          	mov    rdx,QWORD PTR [rax+0x8]`
+upon further investigation, the crash wsa due to `1624: 48 8b 50 08             mov    rdx,QWORD PTR [rax+0x8]`
 accessing invalid memory. `rax+0x8` seems to be out ouf bounds
 
 now, it is known that `**(code **)(rat_pointers[rat_number] + 8))(rat_pointers[rat_number]`
@@ -197,8 +197,8 @@ placed at an offset of 8 bytes. (`rax` is the address of the newly generated
   rat.
 
 ```asm
-136e:	48 8d 15 f4 fe ff ff 	lea    rdx,[rip+0xfffffffffffffef4]        # 1269 <_Z8dialogueP3rat>
-1375:	48 89 50 08          	mov    QWORD PTR [rax+0x8],rdx
+136e:   48 8d 15 f4 fe ff ff    lea    rdx,[rip+0xfffffffffffffef4]        # 1269 <_Z8dialogueP3rat>
+1375:   48 89 50 08             mov    QWORD PTR [rax+0x8],rdx
 ```
 
 however, when just trying to overflow this buffer, namely in function
@@ -224,16 +224,16 @@ the second has name "whoops", wich are `0x62616e616e61` and `0x77686f6f7073`
 respectively)
 ```sh
 pwndbg> x/40wx 0x5555555592a0
-0x5555555592a0:	0xffffdd80	0x00007fff	0x55555269	0x00005555
-0x5555555592b0:	0x616e6162	0x0000616e	0x00000000	0x00000000
-0x5555555592c0:	0x00000010	0x00000000	0x00000031	0x00000000
-0x5555555592d0:	0xffffdd80	0x00007fff	0x55555269	0x00005555
-0x5555555592e0:	0x6f6f6877	0x00007370	0x00000000	0x00000000
-0x5555555592f0:	0x00000010	0x00000000	0x00000031	0x00000000
-0x555555559300:	0x00000000	0x00000000	0x00000000	0x00000000
-0x555555559310:	0x00000000	0x00000000	0x00000000	0x00000000
-0x555555559320:	0x00000000	0x00000000	0x00020ce1	0x00000000
-0x555555559330:	0x00000000	0x00000000	0x00000000	0x00000000
+0x5555555592a0: 0xffffdd80  0x00007fff  0x55555269  0x00005555
+0x5555555592b0: 0x616e6162  0x0000616e  0x00000000  0x00000000
+0x5555555592c0: 0x00000010  0x00000000  0x00000031  0x00000000
+0x5555555592d0: 0xffffdd80  0x00007fff  0x55555269  0x00005555
+0x5555555592e0: 0x6f6f6877  0x00007370  0x00000000  0x00000000
+0x5555555592f0: 0x00000010  0x00000000  0x00000031  0x00000000
+0x555555559300: 0x00000000  0x00000000  0x00000000  0x00000000
+0x555555559310: 0x00000000  0x00000000  0x00000000  0x00000000
+0x555555559320: 0x00000000  0x00000000  0x00020ce1  0x00000000
+0x555555559330: 0x00000000  0x00000000  0x00000000  0x00000000
 ```
 
 as such, it looks like the address of `dialogue(rat*)`, (`0x555555555269` in
@@ -266,16 +266,16 @@ looking back at the memory dump,
 
 ```sh
 pwndbg> x/40wx 0x5555555592a0
-0x5555555592a0:	0xffffdd80	0x00007fff	0x55555269	0x00005555
-0x5555555592b0:	0x616e6162	0x0000616e	0x00000000	0x00000000
-0x5555555592c0:	0x00000010	0x00000000	0x00000031	0x00000000
-0x5555555592d0:	0xffffdd80	0x00007fff	0x55555269	0x00005555
-0x5555555592e0:	0x6f6f6877	0x00007370	0x00000000	0x00000000
-0x5555555592f0:	0x00000010	0x00000000	0x00000031	0x00000000
-0x555555559300:	0x00000000	0x00000000	0x00000000	0x00000000
-0x555555559310:	0x00000000	0x00000000	0x00000000	0x00000000
-0x555555559320:	0x00000000	0x00000000	0x00020ce1	0x00000000
-0x555555559330:	0x00000000	0x00000000	0x00000000	0x00000000
+0x5555555592a0: 0xffffdd80  0x00007fff  0x55555269  0x00005555
+0x5555555592b0: 0x616e6162  0x0000616e  0x00000000  0x00000000
+0x5555555592c0: 0x00000010  0x00000000  0x00000031  0x00000000
+0x5555555592d0: 0xffffdd80  0x00007fff  0x55555269  0x00005555
+0x5555555592e0: 0x6f6f6877  0x00007370  0x00000000  0x00000000
+0x5555555592f0: 0x00000010  0x00000000  0x00000031  0x00000000
+0x555555559300: 0x00000000  0x00000000  0x00000000  0x00000000
+0x555555559310: 0x00000000  0x00000000  0x00000000  0x00000000
+0x555555559320: 0x00000000  0x00000000  0x00020ce1  0x00000000
+0x555555559330: 0x00000000  0x00000000  0x00000000  0x00000000
 ```
 
 if looks like the integer at address `rat_ptr + 0x20` is 0x10? (note: this is at
@@ -299,16 +299,16 @@ this yeilds the following memory
 
 ```sh
 pwndbg> x/40wx 0x5555555592a0
-0x5555555592a0:	0xffffdd80	0x00007fff	0x55555269	0x00005555
-0x5555555592b0:	0x79797979	0x7a7a7a7a	0x7a7a7a7a	0x79790061
-0x5555555592c0:	0x00000010	0x00000000	0x00000031	0x00000000
-0x5555555592d0:	0xffffdd80	0x00007fff	0x55555269	0x00005555
-0x5555555592e0:	0x00000062	0x00000000	0x00000000	0x00000000
-0x5555555592f0:	0x00000010	0x00000000	0x00020d11	0x00000000
-0x555555559300:	0x00000000	0x00000000	0x00000000	0x00000000
-0x555555559310:	0x00000000	0x00000000	0x00000000	0x00000000
-0x555555559320:	0x00000000	0x00000000	0x00000000	0x00000000
-0x555555559330:	0x00000000	0x00000000	0x00000000	0x00000000
+0x5555555592a0: 0xffffdd80  0x00007fff  0x55555269  0x00005555
+0x5555555592b0: 0x79797979  0x7a7a7a7a  0x7a7a7a7a  0x79790061
+0x5555555592c0: 0x00000010  0x00000000  0x00000031  0x00000000
+0x5555555592d0: 0xffffdd80  0x00007fff  0x55555269  0x00005555
+0x5555555592e0: 0x00000062  0x00000000  0x00000000  0x00000000
+0x5555555592f0: 0x00000010  0x00000000  0x00020d11  0x00000000
+0x555555559300: 0x00000000  0x00000000  0x00000000  0x00000000
+0x555555559310: 0x00000000  0x00000000  0x00000000  0x00000000
+0x555555559320: 0x00000000  0x00000000  0x00000000  0x00000000
+0x555555559330: 0x00000000  0x00000000  0x00000000  0x00000000
 ```
 ... which is just super strange? even though the while loop should break at
 `index = 0x10`, it instead *cyclicly loops* around the first 16 bytes of 
@@ -355,16 +355,16 @@ first rat was created)
 
 ```sh
 pwndbg> x/40wx 0x5555555592a0
-0x5555555592a0:	0xffffdd80	0x00007fff	0x55555269	0x00005555
-0x5555555592b0:	0x64636261	0x68676665	0x6c6b6a69	0x706f6e6d
-0x5555555592c0:	0x00000010	0x00000000	0x00000031	0x00000000
-0x5555555592d0:	0xffffdd80	0x00007fff	0x55555269	0x00005555
-0x5555555592e0:	0x61616161	0x61616161	0x61616161	0x61616161
-0x5555555592f0:	0x61616161	0x61616161	0x61616161	0x61616161
-0x555555559300:	0x61616161	0x61616161	0x61616161	0x61616161
-0x555555559310:	0x61616161	0x61616161	0x61616161	0x61616161
-0x555555559320:	0x61616161	0x61616161	0x61616161	0x61616161
-0x555555559330:	0x61616161	0x61616161	0x00556161	0x00005555
+0x5555555592a0: 0xffffdd80  0x00007fff  0x55555269  0x00005555
+0x5555555592b0: 0x64636261  0x68676665  0x6c6b6a69  0x706f6e6d
+0x5555555592c0: 0x00000010  0x00000000  0x00000031  0x00000000
+0x5555555592d0: 0xffffdd80  0x00007fff  0x55555269  0x00005555
+0x5555555592e0: 0x61616161  0x61616161  0x61616161  0x61616161
+0x5555555592f0: 0x61616161  0x61616161  0x61616161  0x61616161
+0x555555559300: 0x61616161  0x61616161  0x61616161  0x61616161
+0x555555559310: 0x61616161  0x61616161  0x61616161  0x61616161
+0x555555559320: 0x61616161  0x61616161  0x61616161  0x61616161
+0x555555559330: 0x61616161  0x61616161  0x00556161  0x00005555
 ```
 
 as such, it looks like the `dialogue(rat*)` address was overwritten. this is
@@ -407,9 +407,9 @@ rat, the program will automatically define the maximum length of its name to be
 the maximum length is stored just after the name in the heap (see below)
 
 ```sh
-0x5555555592a0:	0xffffdd80	0x00007fff	0x55555269	0x00005555
-0x5555555592b0:	0x31333231	0x00003300	0x00000000	0x00000000
-0x5555555592c0:	0x00000010	0x00000000	0x00000031	0x00000000
+0x5555555592a0: 0xffffdd80  0x00007fff  0x55555269  0x00005555
+0x5555555592b0: 0x31333231  0x00003300  0x00000000  0x00000000
+0x5555555592c0: 0x00000010  0x00000000  0x00000031  0x00000000
 ```
 (name is `123`, and after a quad-word including `123`, the limit is placed at
 the beginning of the next quad word.)
@@ -522,12 +522,12 @@ is a possible explaination as to why this error occurs.
 
 ```sh
 pwndbg> x/40wx 0x5555555592a0
-0x5555555592a0:	0xffffdd80	0x00007fff	0x55555269	0x00005555
-0x5555555592b0:	0x616e6162	0x0000616e	0x00000000	0x00000000
-0x5555555592c0:	0x00000010	0x00000000	0x00000031	0x00000000
-0x5555555592d0:	0xffffdd80	0x00007fff	0x55555269	0x00005555
-0x5555555592e0:	0x6f6f6877	0x00007370	0x00000000	0x00000000
-0x5555555592f0:	0x00000010	0x00000000	0x00000031	0x00000000
+0x5555555592a0: 0xffffdd80  0x00007fff  0x55555269  0x00005555
+0x5555555592b0: 0x616e6162  0x0000616e  0x00000000  0x00000000
+0x5555555592c0: 0x00000010  0x00000000  0x00000031  0x00000000
+0x5555555592d0: 0xffffdd80  0x00007fff  0x55555269  0x00005555
+0x5555555592e0: 0x6f6f6877  0x00007370  0x00000000  0x00000000
+0x5555555592f0: 0x00000010  0x00000000  0x00000031  0x00000000
 ```
 
 as a recap, our current understanding of the rat structure.
@@ -617,24 +617,24 @@ garbage, but regardless, it doesn't matter, it's inaccessible at the start.
 creating the first rat yeilds the following memory dump:
 
 ```sh
-0x5555555592a0:	0xffffdd80	0x00007fff	0x55555269	0x00005555
-0x5555555592b0:	0x64667361	0x00000000	0x00000000	0x00000000
-0x5555555592c0:	0x00000010	0x00000000	0x00020d41	0x00000000
-0x5555555592d0:	0x00000000	0x00000000	0x00000000	0x00000000
-0x5555555592e0:	0x00000000	0x00000000	0x00000000	0x00000000
-0x5555555592f0:	0x00000000	0x00000000	0x00000000	0x00000000
+0x5555555592a0: 0xffffdd80  0x00007fff  0x55555269  0x00005555
+0x5555555592b0: 0x64667361  0x00000000  0x00000000  0x00000000
+0x5555555592c0: 0x00000010  0x00000000  0x00020d41  0x00000000
+0x5555555592d0: 0x00000000  0x00000000  0x00000000  0x00000000
+0x5555555592e0: 0x00000000  0x00000000  0x00000000  0x00000000
+0x5555555592f0: 0x00000000  0x00000000  0x00000000  0x00000000
 ```
 
 now that we created one rat, we see that, where `0x31` usually is, `0x00020d41`
 is. the usage of this comes apparent when a second rat is created, which yields:
 
 ```sh
-0x5555555592a0:	0xffffdd80	0x00007fff	0x55555269	0x00005555
-0x5555555592b0:	0x00006968	0x00000000	0x00000000	0x00000000
-0x5555555592c0:	0x00000010	0x00000000	0x00000031	0x00000000
-0x5555555592d0:	0xffffdd80	0x00007fff	0x55555269	0x00005555
-0x5555555592e0:	0x31636261	0x00003332	0x00000000	0x00000000
-0x5555555592f0:	0x00000010	0x00000000	0x00020d11	0x00000000
+0x5555555592a0: 0xffffdd80  0x00007fff  0x55555269  0x00005555
+0x5555555592b0: 0x00006968  0x00000000  0x00000000  0x00000000
+0x5555555592c0: 0x00000010  0x00000000  0x00000031  0x00000000
+0x5555555592d0: 0xffffdd80  0x00007fff  0x55555269  0x00005555
+0x5555555592e0: 0x31636261  0x00003332  0x00000000  0x00000000
+0x5555555592f0: 0x00000010  0x00000000  0x00020d11  0x00000000
 ```
 
 with some research, particularly [bin 0x14 from LiveOverflow's binary
