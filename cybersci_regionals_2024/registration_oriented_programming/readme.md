@@ -150,7 +150,50 @@ YIPPEE!!
 
 This provides a return address to `__libc_start_call_main`
 
-> Note that the `libc` and `ld` binary used here was extracted from the
-> dockerfile, after building and running it. Then,
+> Note: the `libc` and `ld` binary used here was extracted from the dockerfile,
+> after building and running it. Then,
 > [`pwninit`](https://github.com/io12/pwninit) is able to patch the binary to
 > use the `libc.so.6` and `ld-linux-86-64.so.2` from the container.
+
+As the return address points to `__libc_start_call_main`, then we already know
+the address of where the `libc`.
+
+> Note: we want to determine where `libc` is in memory for two reasons
+>
+> 1. Address Space Layout Randomization (ASLR) is enabled, indicated by the
+>    binary being compiled as a Position Independent Executable (PIE). This
+>    means that the library is placed anywhere (within a decently large region
+>    of memory). This typically means that general return address overwrites
+>    would be defeated, as the address used in a previous attack is very
+>    unlikely to work in the next attack attempt. Leaking the address without
+>    restarting the binary means we would know where to hit using some
+>    arithmetic and address offsets.
+> 2. We want to run code from `libc`, as it contains a lot more code that could
+>    be abused, including `system`, and the string `/bin/sh` :>
+
+Once we know where `libc` is located, it is possible to set a call to `system`
+_using_ the string `/bin/sh` using [ROP](https://youtu.be/zaQVNM3or7k) (hence,
+then name of the challenge).
+
+The difficulty then namely lies in writing the addresses of the gadgets into the
+stack for execution. Luckily, we now have a mechanism to write stuff onto the
+stack, with no sanitation (using `fgets`)!! Thus, we can write the necessary
+gadgets onto the address, starting at index 19 to overwrite the leaked
+`__libc_start_call_main` address, and iterating from there. This replaces a
+typical buffer overflow, which smashes the return address of the function,
+implemented below.
+
+```py
+# write each address onto the stack, creating our rop chain
+ropchain_list = [rop.chain()[i:i+8] for i in range(0, len(rop.chain()), 8)]
+for i, addr in enumerate(ropchain_list):
+    # return address is at index 19, start overwriting there
+    r.sendlineafter(b"> ", bytes(f"1\n{i+19}\n", "latin-1")+addr)
+```
+
+Now, it is possible to cause the main function to return, which is just done by
+selecting option 3.
+
+Doing all this, this gives a shell and the flag can simply be `cat`-ed
+
+This gives the following flag: `flag{rawr_d41d8cd98f00b204e9800998ecf8427e}`
