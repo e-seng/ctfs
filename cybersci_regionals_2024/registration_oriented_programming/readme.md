@@ -120,3 +120,37 @@ This chunk of code does not perform any boundary checks either. Since the buffer
 is of size 136, the theoretical maximum index would be 17. As such, it is
 possible to achieve an address leak with a large-enough index, which just
 happened to be 19.
+
+```
+=== Registration List ===
+0:
+1:
+2:
+3:
+4:
+5: \x18\xa6F\x11\xfd
+6: \x06
+7:
+8:
+9:
+10:
+11:
+12:
+13:
+14:
+15: \xf0:V\x12\x7f
+16: 0\xa7F\x11\xfd
+17:
+18: \xf0\xa6F\xfd
+19: ʑ5\x1d\x12\x7f
+20:
+```
+
+YIPPEE!!
+
+This provides a return address to `__libc_start_call_main`
+
+> Note that the `libc` and `ld` binary used here was extracted from the
+> dockerfile, after building and running it. Then,
+> [`pwninit`](https://github.com/io12/pwninit) is able to patch the binary to
+> use the `libc.so.6` and `ld-linux-86-64.so.2` from the container.
